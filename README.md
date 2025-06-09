@@ -157,9 +157,9 @@ The configuration can contain the following properties:
         * **"mired"**: Using mired (more specifically _microreciprocal degree_) to calculate color temperature
         * **"kelvin"**: Using Kelvin to calculate color temperature
     * `minValue` \<number\> **optional** \(Default: **50**\): Defines the minimum supported temperature in the 
-        given `unit`. The defaut is **50** mired or **20.000** Kelvin.
+        given `unit`. The default is **50** mired or **20.000** Kelvin.
     * `maxValue` \<number\> **optional** \(Default: **400**\): Defines the maximum supported temperature in the 
-        given `unit`. The fault is **400** mired or **2.500** Kelvin.
+        given `unit`. The default is **400** mired or **2.500** Kelvin.
     * `statusPattern` \<string\> **optional** \(Default: **"([0-9]{2,3})"** \[**"([0-9]{4,5})"** when using Kelvin\]): Defines a regex pattern with which the 
         color temperature is extracted from the body of the http response from the `colorTemperature.statusUrl`. 
         The group which should be extracted can be configured with the `colorTemperature.patternGroupToExtract` property.
@@ -196,8 +196,6 @@ pulls updates from your http device. For more information read [pulling updates]
 (This option is currently only supported for the _'On'_ characteristic!)
 * `mqtt` \<[mqttObject](#mqttobject)\> **optional**: Defines all properties used for mqtt connection ([More on MQTT](#using-mqtt)).  
     For configuration see [mqttObject](#mqttobject).
-
-- `debug` \<boolean\> **optional**: If set to true debug mode is enabled and the plugin prints more detailed information.
 
 In the [Examples](#examples) section are some example configurations to get you started.
 
