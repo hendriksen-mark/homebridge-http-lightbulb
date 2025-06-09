@@ -25,7 +25,6 @@
     ],
     "accessories": [
         {
-            "accessory": "HTTP-LIGHTBULB",
             "name": "TM1637",
             "onUrl": "http://slaapkamer-temp.lan:8000/on",
             "offUrl": "http://slaapkamer-temp.lan:8000/off",
@@ -34,9 +33,10 @@
                 "setUrl": "http://slaapkamer-temp.lan:8000/Bri/%s",
                 "statusUrl": "http://slaapkamer-temp.lan:8000/infoBri",
                 "unit": "percent",
-                "withholdPowerUpdate": "true"
+                "withholdPowerUpdate": true
             },
-            "pullInterval": 5000
+            "pullInterval": 5000,
+            "accessory": "HTTP-LIGHTBULB"
         }
     ]
 }
