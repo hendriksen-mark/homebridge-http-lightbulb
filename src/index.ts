@@ -13,7 +13,6 @@ const FIRMWARE_REVISION: string = PACKAGE_JSON.version;
 
 let Service: any, Characteristic: any;
 
-// Define the HttpLightConfig type if not imported from elsewhere
 type HttpLightConfig = {
     name: string;
     power?: any;
