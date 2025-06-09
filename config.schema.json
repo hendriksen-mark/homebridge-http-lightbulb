@@ -13,362 +13,63 @@
         "default": "HTTP Lightbulb"
       },
       "onUrl": {
-        "type": "object",
-        "title": "On URL",
+        "type": "string",
+        "title": "onUrl",
         "required": true,
-        "properties": {
-          "url": {
-            "type": "string",
-            "title": "URL",
-            "required": true,
-            "default": "http://localhost/on"
-          },
-          "method": {
-            "type": "string",
-            "enum": ["GET", "POST", "PUT", "DELETE"],
-            "default": "GET",
-            "title": "HTTP Method"
-          },
-          "body": {
-            "type": "string",
-            "title": "Body (optional)"
-          },
-          "strictSSL": {
-            "type": "boolean",
-            "title": "Strict SSL",
-            "default": false
-          },
-          "auth": {
-            "type": "object",
-            "title": "HTTP Authentication (optional)",
-            "required": false,
-            "properties": {
-              "username": {
-                "type": "string",
-                "title": "Username",
-                "required": true
-              },
-              "password": {
-                "type": "string",
-                "title": "Password",
-                "required": true
-              },
-              "sendImmediately": {
-                "type": "boolean",
-                "title": "Send Immediately",
-                "default": false
-              }
-            }
-          },
-          "headers": {
-            "type": "object",
-            "title": "Headers (optional)",
-            "required": false,
-            "properties": {
-              "Content-Type": {
-                "type": "string",
-                "title": "Content-Type",
-                "default": "application/json"
-              },
-              "Custom-Header": {
-                "type": "string",
-                "title": "Custom Header"
-              }
-            }
-          }
-        }
+        "placeholder": "http://localhost/on"
       },
       "offUrl": {
-        "type": "object",
-        "title": "Off URL",
+        "type": "string",
+        "title": "offUrl",
         "required": true,
-        "properties": {
-          "url": {
-            "type": "string",
-            "title": "URL",
-            "required": true,
-            "default": "http://localhost/off"
-          },
-          "method": {
-            "type": "string",
-            "enum": ["GET", "POST", "PUT", "DELETE"],
-            "default": "GET",
-            "title": "HTTP Method"
-          },
-          "body": {
-            "type": "string",
-            "title": "Body (optional)"
-          },
-          "strictSSL": {
-            "type": "boolean",
-            "title": "Strict SSL",
-            "default": false
-          },
-          "auth": {
-            "type": "object",
-            "title": "HTTP Authentication (optional)",
-            "required": false,
-            "properties": {
-              "username": {
-                "type": "string",
-                "title": "Username",
-                "required": true
-              },
-              "password": {
-                "type": "string",
-                "title": "Password",
-                "required": true
-              },
-              "sendImmediately": {
-                "type": "boolean",
-                "title": "Send Immediately",
-                "default": false
-              }
-            }
-          },
-          "headers": {
-            "type": "object",
-            "title": "Headers (optional)",
-            "required": false,
-            "properties": {
-              "Content-Type": {
-                "type": "string",
-                "title": "Content-Type",
-                "default": "application/json"
-              },
-              "Custom-Header": {
-                "type": "string",
-                "title": "Custom Header"
-              }
-            }
-          }
-        }
+        "placeholder": "http://localhost/off"
       },
       "statusUrl": {
-        "type": "object",
-        "title": "Status URL",
+        "type": "string",
+        "title": "statusUrl",
         "required": true,
-        "properties": {
-          "url": {
-            "type": "string",
-            "title": "URL",
-            "required": true,
-            "default": "http://localhost/status"
-          },
-          "method": {
-            "type": "string",
-            "enum": ["GET", "POST", "PUT", "DELETE"],
-            "default": "GET",
-            "title": "HTTP Method"
-          },
-          "body": {
-            "type": "string",
-            "title": "Body (optional)"
-          },
-          "strictSSL": {
-            "type": "boolean",
-            "title": "Strict SSL",
-            "default": false
-          },
-          "auth": {
-            "type": "object",
-            "title": "HTTP Authentication (optional)",
-            "required": false,
-            "properties": {
-              "username": {
-                "type": "string",
-                "title": "Username",
-                "required": true
-              },
-              "password": {
-                "type": "string",
-                "title": "Password",
-                "required": true
-              },
-              "sendImmediately": {
-                "type": "boolean",
-                "title": "Send Immediately",
-                "default": false
-              }
-            }
-          },
-          "headers": {
-            "type": "object",
-            "title": "Headers (optional)",
-            "required": false,
-            "properties": {
-              "Content-Type": {
-                "type": "string",
-                "title": "Content-Type",
-                "default": "application/json"
-              },
-              "Custom-Header": {
-                "type": "string",
-                "title": "Custom Header"
-              }
-            }
-          }
-        }
+        "placeholder": "http://localhost/status"
       },
       "statusPattern": {
         "type": "string",
         "title": "Power Status Pattern (RegExp)",
-        "default": "1"
+        "placeholder": "1"
       },
       "brightness": {
         "title": "Brightness",
         "type": "object",
         "properties": {
           "setUrl": {
-            "type": "object",
-            "title": "Set URL",
+            "type": "string",
+            "title": "setUrl",
             "required": true,
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "required": true,
-                "default": "http://localhost/bri/%s"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "placeholder": "http://localhost/bri/%s"
           },
           "statusUrl": {
-            "type": "object",
-            "title": "Status URL",
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "default": "http://localhost/status"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "type": "string",
+            "title": "statusUrl",
+            "placeholder": "http://localhost/status"
           },
           "unit": {
             "type": "string",
             "enum": ["percent", "rgb"],
-            "default": "percent",
+            "placeholder": "percent",
             "title": "Unit"
           },
           "statusPattern": {
             "type": "string",
             "title": "Status Pattern (RegExp)",
-            "default": "([0-9]{1,3})"
+            "placeholder": "([0-9]{1,3})"
           },
           "patternGroupToExtract": {
             "type": "integer",
             "title": "Pattern Group To Extract",
-            "default": 1
+            "placeholder": 1
           },
           "withholdPowerUpdate": {
             "type": "boolean",
             "title": "Withhold Power Update",
-            "default": false
+            "placeholder": false
           }
         }
       },
@@ -377,152 +78,32 @@
         "type": "object",
         "properties": {
           "setUrl": {
-            "type": "object",
-            "title": "Set URL",
+            "type": "string",
+            "title": "setUrl",
             "required": true,
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "required": true,
-                "default": "http://localhost/hue/%s"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "placeholder": "http://localhost/hue/%s"
           },
           "statusUrl": {
-            "type": "object",
-            "title": "Status URL",
+            "type": "string",
+            "title": "statusUrl",
             "required": true,
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "required": true,
-                "default": "http://localhost/status"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "placeholder": "http://localhost/status"
           },
           "unit": {
             "type": "string",
             "enum": ["hsv", "zigbee"],
-            "default": "hsv",
+            "placeholder": "hsv",
             "title": "Unit"
           },
           "statusPattern": {
             "type": "string",
             "title": "Status Pattern (RegExp)",
-            "default": "([0-9]{1,3})"
+            "placeholder": "([0-9]{1,3})"
           },
           "patternGroupToExtract": {
             "type": "integer",
             "title": "Pattern Group To Extract",
-            "default": 1
+            "placeholder": 1
           }
         }
       },
@@ -531,150 +112,31 @@
         "type": "object",
         "properties": {
           "setUrl": {
-            "type": "object",
-            "title": "Set URL",
+            "type": "string",
+            "title": "setUrl",
             "required": true,
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "required": true,
-                "default": "http://localhost/sat/%s"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "placeholder": "http://localhost/sat/%s"
           },
           "statusUrl": {
-            "type": "object",
-            "title": "Status URL",
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "default": "http://localhost/status"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "type": "string",
+            "title": "statusUrl",
+            "placeholder": "http://localhost/status"
           },
           "unit": {
             "type": "string",
             "enum": ["percent", "rgb"],
-            "default": "percent",
+            "placeholder": "percent",
             "title": "Unit"
           },
           "statusPattern": {
             "type": "string",
             "title": "Status Pattern (RegExp)",
-            "default": "([0-9]{1,3})"
+            "placeholder": "([0-9]{1,3})"
           },
           "patternGroupToExtract": {
             "type": "integer",
             "title": "Pattern Group To Extract",
-            "default": 1
+            "placeholder": 1
           }
         }
       },
@@ -683,160 +145,41 @@
         "type": "object",
         "properties": {
           "setUrl": {
-            "type": "object",
-            "title": "Set URL",
+            "type": "string",
+            "title": "setUrl",
             "required": true,
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "required": true,
-                "default": "http://localhost/temp/%s"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "placeholder": "http://localhost/temp/%s"
           },
           "statusUrl": {
-            "type": "object",
-            "title": "Status URL",
-            "properties": {
-              "url": {
-                "type": "string",
-                "title": "URL",
-                "default": "http://localhost/status"
-              },
-              "method": {
-                "type": "string",
-                "enum": ["GET", "POST", "PUT", "DELETE"],
-                "default": "GET",
-                "title": "HTTP Method"
-              },
-              "body": {
-                "type": "string",
-                "title": "Body (optional)"
-              },
-              "strictSSL": {
-                "type": "boolean",
-                "title": "Strict SSL",
-                "default": false
-              },
-              "auth": {
-                "type": "object",
-                "title": "HTTP Authentication (optional)",
-                "required": false,
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "Username",
-                    "required": true
-                  },
-                  "password": {
-                    "type": "string",
-                    "title": "Password",
-                    "required": true
-                  },
-                  "sendImmediately": {
-                    "type": "boolean",
-                    "title": "Send Immediately",
-                    "default": false
-                  }
-                }
-              },
-              "headers": {
-                "type": "object",
-                "title": "Headers (optional)",
-                "required": false,
-                "properties": {
-                  "Content-Type": {
-                    "type": "string",
-                    "title": "Content-Type",
-                    "default": "application/json"
-                  },
-                  "Custom-Header": {
-                    "type": "string",
-                    "title": "Custom Header"
-                  }
-                }
-              }
-            }
+            "type": "string",
+            "title": "statusUrl",
+            "placeholder": "http://localhost/status"
           },
           "unit": {
             "type": "string",
             "enum": ["mired", "kelvin"],
-            "default": "mired",
+            "placeholder": "mired",
             "title": "Unit"
           },
           "minValue": {
             "type": "integer",
             "title": "Min Value",
-            "default": 50
+            "placeholder": 50
           },
           "maxValue": {
             "type": "integer",
             "title": "Max Value",
-            "default": 400
+            "placeholder": 400
           },
           "statusPattern": {
             "type": "string",
             "title": "Status Pattern (RegExp)",
-            "default": "([0-9]{2,3})"
+            "placeholder": "([0-9]{2,3})"
           },
           "patternGroupToExtract": {
             "type": "integer",
             "title": "Pattern Group To Extract",
-            "default": 1
+            "placeholder": 1
           }
         }
       },
@@ -844,40 +187,50 @@
         "title": "HTTP Authentication",
         "type": "object",
         "properties": {
-          "username": { "type": "string", "title": "Username" },
-          "password": { "type": "string", "title": "Password" },
-          "sendImmediately": { "type": "boolean", "title": "Send Immediately", "default": true }
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "sendImmediately": {
+            "type": "boolean",
+            "title": "Send Immediately",
+            "placeholder": true
+          }
         }
       },
       "statusCache": {
         "type": "integer",
         "title": "Power Status Cache (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "brightnessCache": {
         "type": "integer",
         "title": "Brightness Cache (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "hueCache": {
         "type": "integer",
         "title": "Hue Cache (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "saturationCache": {
         "type": "integer",
         "title": "Saturation Cache (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "colorTemperatureCache": {
         "type": "integer",
         "title": "Color Temperature Cache (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "pullInterval": {
         "type": "integer",
         "title": "Pull Interval (milliseconds)",
-        "default": 0
+        "placeholder": 0
       },
       "mqtt": {
         "title": "MQTT Options",
@@ -891,7 +244,7 @@
           "port": {
             "type": "integer",
             "title": "MQTT Port",
-            "default": 1883
+            "placeholder": 1883
           },
           "credentials": {
             "type": "object",
@@ -932,7 +285,7 @@
                 "patternGroupToExtract": {
                   "type": "integer",
                   "title": "Pattern Group To Extract",
-                  "default": 1
+                  "placeholder": 1
                 }
               }
             }
@@ -940,38 +293,38 @@
           "protocol": {
             "type": "string",
             "title": "MQTT Protocol",
-            "default": "mqtt"
+            "placeholder": "mqtt"
           },
           "qos": {
             "type": "integer",
             "title": "MQTT QoS",
             "enum": [0, 1, 2],
-            "default": 0
+            "placeholder": 0
           },
           "clientId": {
             "type": "string",
             "title": "MQTT Client ID",
-            "default": "'mqttjs_' + Math.random().toString(16).substr(2, 8)"
+            "placeholder": "'mqttjs_' + Math.random().toString(16).substr(2, 8)"
           },
           "keepalive": {
             "type": "integer",
             "title": "MQTT Keepalive",
-            "default": 60
+            "placeholder": 60
           },
           "clean": {
             "type": "boolean",
             "title": "MQTT Clean Session",
-            "default": true
+            "placeholder": true
           },
           "reconnectPeriod": {
             "type": "integer",
             "title": "MQTT Reconnect Period (milliseconds)",
-            "default": 1000
+            "placeholder": 1000
           },
           "connectTimeout": {
             "type": "integer",
             "title": "MQTT Connect Timeout (milliseconds)",
-            "default": 30000
+            "placeholder": 30000
           }
         }
       },
@@ -988,17 +341,17 @@
             "type": "integer",
             "title": "MQTT QoS",
             "enum": [0, 1, 2],
-            "default": 0
+            "placeholder": 0
           },
           "retain": {
             "type": "boolean",
             "title": "MQTT Retain",
-            "default": false
+            "placeholder": false
           },
           "dup": {
             "type": "boolean",
             "title": "MQTT Duplicate",
-            "default": false
+            "placeholder": false
           },
           "payloadFormatter": {
             "type": "string",
@@ -1019,7 +372,7 @@
             "type": "integer",
             "title": "MQTT QoS",
             "enum": [0, 1, 2],
-            "default": 0
+            "placeholder": 0
           },
           "messagePattern": {
             "type": "string",
@@ -1028,7 +381,7 @@
           "patternGroupToExtract": {
             "type": "integer",
             "title": "Pattern Group To Extract",
-            "default": 1
+            "placeholder": 1
           }
         }
       },
@@ -1041,5 +394,204 @@
         "title": "Notification Password"
       }
     }
+  },
+  "layout":[
+    {
+    	"type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "name"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Basic",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "onUrl",
+        "offUrl",
+        "statusUrl",
+        "statusPattern"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Brightness",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "brightness.setUrl",
+        "brightness.statusUrl",
+        "brightness.unit",
+        "brightness.statusPattern",
+        "brightness.patternGroupToExtract",
+        "brightness.withholdPowerUpdate"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "hue",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "hue.setUrl",
+        "hue.statusUrl",
+        "hue.unit",
+        "hue.statusPattern",
+        "hue.patternGroupToExtract"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Saturation",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "saturation.setUrl",
+        "saturation.statusUrl",
+        "saturation.unit",
+        "saturation.statusPattern",
+        "saturation.patternGroupToExtract"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Color Temperature",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "colorTemperature.setUrl",
+        "colorTemperature.statusUrl",
+        "colorTemperature.unit",
+        "colorTemperature.statusPattern",
+        "colorTemperature.patternGroupToExtract"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "HTTP Authentication",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "auth.username",
+        "auth.password",
+        "auth.sendImmediately"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced",
+      "expandable": true,
+      "flex-flow": "column wrap",
+      "displayFlex": true,
+      "flex-direction": "column",
+      "items": [
+        "statusCache",
+        "brightnessCache",
+        "hueCache",
+        "saturationCache",
+        "colorTemperatureCache",
+        "pullInterval",
+        {
+          "type": "fieldset",
+          "title": "MQTT Options",
+          "expandable": true,
+          "flex-flow": "column wrap",
+          "displayFlex": true,
+          "flex-direction": "column",
+          "items": [
+            "mqtt.host",
+            "mqtt.port",
+            {
+              "type": "fieldset",
+              "title": "Credentials",
+              "expandable": true,
+              "flex-flow": "column wrap",
+              "displayFlex": true,
+              "flex-direction": "column",
+              "items": [
+                "mqtt.credentials.username",
+                "mqtt.credentials.password"
+              ]
+            },
+            {
+              "type": "fieldset",
+              "title": "MQTT Subscriptions",
+              "expandable": true,
+              "flex-flow": "column wrap",
+              "displayFlex": true,
+              "flex-direction": "column",
+              "items": [
+                  "mqtt.subscriptions.topic",
+                  "mqtt.subscriptions.characteristic",
+                  "mqtt.subscriptions.messagePattern",
+                  "mqtt.subscriptions.patternGroupToExtract"
+              ]
+            },
+            "mqtt.protocol",
+            "mqtt.qos",
+            "mqtt.clientId",
+            "mqtt.keepalive",
+            "mqtt.clean",
+            "mqtt.reconnectPeriod",
+            "mqtt.connectTimeout"
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "MQTT Set Power Topic",
+          "expandable": true,
+          "flex-flow": "column wrap",
+          "displayFlex": true,
+          "flex-direction": "column",
+          "items": [
+            "setPowerTopic.topic",
+            "setPowerTopic.qos",
+            "setPowerTopic.retain",
+            "setPowerTopic.dup",
+            "setPowerTopic.payloadFormatter"
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "MQTT Get Power Topic",
+          "expandable": true,
+          "flex-flow": "column wrap",
+          "displayFlex": true,
+          "flex-direction": "column",
+          "items": [
+            "getPowerTopic.topic",
+            "getPowerTopic.qos",
+            "getPowerTopic.messagePattern",
+            "getPowerTopic.patternGroupToExtract"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Notification Server",
+      "expandable": true,
+      "flex-flow": "row wrap",
+      "displayFlex": true,
+      "flex-direction": "row",
+      "items": [
+        "notificationID",
+        "notificationPassword"
+      ]
     }
+  ]
 }
