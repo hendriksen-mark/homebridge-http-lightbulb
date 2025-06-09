@@ -5,3 +5,8 @@ node_modules/
 .idea
 **/*.iml
 .DS_Store
+dist/
+/test/hbConfig/persist
+/test/hbConfig/accessories
+/test/hbConfig/backups
+/.vscode

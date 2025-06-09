@@ -1,0 +1,41 @@
+{
+    "bridge": {
+        "name": "Homebridge",
+        "username": "AA:BB:CC:DD:EE:01",
+        "port": 51826,
+        "pin": "031-45-154"
+    },
+    "description": "HomeBridge HTTP Status Control",
+    "plugins": [
+        "homebridge-http-lightbulb",
+        "homebridge-config-ui-x"
+    ],
+    "platforms": [
+        {
+            "name": "Config",
+            "port": 8581,
+            "auth": "none",
+            "theme": "orange",
+            "lightingMode": "auto",
+            "menuMode": "default",
+            "tempUnits": "c",
+            "lang": "auto",
+            "platform": "config"
+        }
+    ],
+    "accessories": [
+        {
+            "accessory": "HTTP-LIGHTBULB",
+            "name": "TM1637",
+            "onUrl": "http://slaapkamer-temp.lan:8000/on",
+            "offUrl": "http://slaapkamer-temp.lan:8000/off",
+            "statusUrl": "http://slaapkamer-temp.lan:8000/status",
+            "brightness": {
+                "setUrl": "http://slaapkamer-temp.lan:8000/Bri/%s",
+                "statusUrl": "http://slaapkamer-temp.lan:8000/infoBri",
+                "unit": "percent",
+                "withholdPowerUpdate": "true"
+            }
+        }
+    ]
+}
