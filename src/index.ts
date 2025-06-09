@@ -1,7 +1,6 @@
 'use strict';
 
 import { configParser, http, PullTimer, notifications, Cache, utils, MQTTClient } from 'homebridge-http-utils';
-import { setTimeout } from 'timers';
 
 import PACKAGE_JSON from '../package.json';
 
@@ -183,29 +182,36 @@ class HttpLightbulb {
       }
     }
 
-    const homebridgeService = new Service.Lightbulb(this.name);
-    homebridgeService.getCharacteristic(Characteristic.On)
-      .on('get', this.getPowerState.bind(this))
-      .on('set', this.setPowerState.bind(this));
+    this.homebridgeService = new Service.Lightbulb(this.name);
+
+    // Register characteristic handlers here, after this.power is initialized
+    this.homebridgeService
+      .getCharacteristic(Characteristic.On)
+      .onGet(this.getPowerState.bind(this))
+      .onSet(this.setPowerState.bind(this));
     if (this.brightness) {
-      homebridgeService.addCharacteristic(Characteristic.Brightness)
-        .on('get', this.getBrightness.bind(this))
-        .on('set', this.setBrightness.bind(this));
+      this.homebridgeService
+        .getCharacteristic(Characteristic.Brightness)
+        .onGet(this.getBrightness.bind(this))
+        .onSet(this.setBrightness.bind(this));
     }
     if (this.hue) {
-      homebridgeService.addCharacteristic(Characteristic.Hue)
-        .on('get', this.getHue.bind(this))
-        .on('set', this.setHue.bind(this));
+      this.homebridgeService
+        .getCharacteristic(Characteristic.Hue)
+        .onGet(this.getHue.bind(this))
+        .onSet(this.setHue.bind(this));
     }
     if (this.saturation) {
-      homebridgeService.addCharacteristic(Characteristic.Saturation)
-        .on('get', this.getSaturation.bind(this))
-        .on('set', this.setSaturation.bind(this));
+      this.homebridgeService
+        .getCharacteristic(Characteristic.Saturation)
+        .onGet(this.getSaturation.bind(this))
+        .onSet(this.setSaturation.bind(this));
     }
     if (this.colorTemperature) {
-      homebridgeService.addCharacteristic(Characteristic.ColorTemperature)
-        .on('get', this.getColorTemperature.bind(this))
-        .on('set', this.setColorTemperature.bind(this))
+      this.homebridgeService
+        .getCharacteristic(Characteristic.ColorTemperature)
+        .onGet(this.getColorTemperature.bind(this))
+        .onSet(this.setColorTemperature.bind(this))
         .setProps({
           minValue: this.colorTemperature.minValue,
           maxValue: this.colorTemperature.maxValue,
@@ -213,7 +219,7 @@ class HttpLightbulb {
     }
 
     if (this.adaptiveLightingSupport && this.brightness && this.colorTemperature) {
-      this.adaptiveLightingController = new api.hap.AdaptiveLightingController(homebridgeService);
+      this.adaptiveLightingController = new api.hap.AdaptiveLightingController(this.homebridgeService);
     }
 
     /** @namespace config.mqtt */
@@ -228,7 +234,7 @@ class HttpLightbulb {
 
       if (options) {
         try {
-          this.mqttClient = new MQTTClient(homebridgeService, options, this.log);
+          this.mqttClient = new MQTTClient(this.homebridgeService, options, this.log);
           this.mqttClient.connect();
         } catch (error: any) {
           this.log.error('Error occurred creating mqtt client: ' + error.message);
@@ -244,9 +250,6 @@ class HttpLightbulb {
 
       this.mqttClient.subscribe(this.power.getTopic, 'On');
     }
-
-    // config parse successfully and nothing can interrupt the startup anymore => so we assign the service to the global variable
-    this.homebridgeService = homebridgeService;
 
     if (this.mqttClient) {
       this.mqttClient.on('message-On', this.handleMQTTMessage.bind(this));
@@ -271,8 +274,24 @@ class HttpLightbulb {
         log,
         this.pullInterval,
         async () => {
-          const value = await this.getPowerState.bind(this);
-          this.homebridgeService.getCharacteristic(Characteristic.On).updateValue(value);
+          const value = await this.getPowerState();
+          this.homebridgeService.updateCharacteristic(Characteristic.On, value);
+          if (this.brightness) {
+            const brightness = await this.getBrightness();
+            this.homebridgeService.updateCharacteristic(Characteristic.Brightness, brightness);
+          }
+          if (this.hue && this.colorMode === ColorMode.COLOR) {
+            const hue = await this.getHue();
+            this.homebridgeService.updateCharacteristic(Characteristic.Hue, hue);
+          }
+          if (this.saturation && this.colorMode === ColorMode.COLOR) {
+            const saturation = await this.getSaturation();
+            this.homebridgeService.updateCharacteristic(Characteristic.Saturation, saturation);
+          }
+          if (this.colorTemperature && this.colorMode === ColorMode.TEMPERATURE) {
+            const colorTemperature = await this.getColorTemperature();
+            this.homebridgeService.updateCharacteristic(Characteristic.ColorTemperature, colorTemperature);
+          }
         },
         undefined,
       );
@@ -731,7 +750,7 @@ class HttpLightbulb {
     callback(value);
   }
 
-  getPowerState(callback: any) {
+  getPowerState = async(): Promise<boolean> => {
     if (this.pullTimer) {
       this.pullTimer.resetTimer();
     }
@@ -739,42 +758,37 @@ class HttpLightbulb {
     // if mqtt is enabled just return the current value
     if (this.power.isMqtt || !this.statusCache.shouldQuery()) {
       const value = this.homebridgeService.getCharacteristic(Characteristic.On).value;
-      this.log.debug(`getPowerState() returning cached value '${value? 'ON': 'OFF'}'${this.statusCache.isInfinite()? ' (infinite cache)': ''}`);
-
-      callback(null, value);
-      return;
+      this.log.debug(`getPowerState() returning cached value '${value ? 'ON' : 'OFF'}'${this.statusCache.isInfinite() ? ' (infinite cache)' : ''}`);
+      return !!value;
     }
 
-    http.httpRequest(this.power.statusUrl)
-      .then(response => {
-        let body = response.data;
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        this.log.debug(`getPowerState() request returned successfully (${response.status}). Body: '${body}'`);
+    try {
+      const response = await http.httpRequest(this.power.statusUrl);
+      let body = response.data;
+      if (typeof body !== 'string') {
+        body = JSON.stringify(body);
+      }
+      this.log.debug(`getPowerState() request returned successfully (${response.status}). Body: '${body}'`);
 
-        const switchedOn = this.power.statusPattern.test(body);
+      const switchedOn = this.power.statusPattern.test(body);
 
-        this.log.info('Power is currently %s', switchedOn? 'ON': 'OFF');
+      this.log.info('Power is currently %s', switchedOn ? 'ON' : 'OFF');
 
-        this.statusCache.queried();
-        callback(null, switchedOn);
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`getPowerState() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('getPowerState() failed: %s', error.message);
-          callback(error);
-        }
-      });
+      this.statusCache.queried();
+      return switchedOn;
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`getPowerState() http request returned http error code ${error.response.status}: ${error.response.data}`);
+      } else {
+        this.log.error('getPowerState() failed: %s', error.message);
+      }
+      throw error;
+    }
   }
 
-  setPowerState(on: any, callback: any) {
+  setPowerState = async (on: boolean): Promise<void> => {
     if (on && this.withholdPowerCall && this.homebridgeService.getCharacteristic(Characteristic.On).value) {
       this.withholdPowerCall = false;
-      callback();
       return;
     }
 
@@ -783,21 +797,18 @@ class HttpLightbulb {
     }
 
     if (!this.power.isMqtt) {
-      const urlObject = on ? this.power.onUrl : this.power.offUrl;
-      http.httpRequest(urlObject)
-        .then(response => {
-          this.log.debug(`setPowerState() Successfully set power to ${on? 'ON': 'OFF'}. Body: '${response.data}'`);
-          callback();
-        })
-        .catch(error => {
-          if (error.response) {
-            this.log.error(`setPowerState() http request returned http error code ${error.response.status}: ${error.response.data}`);
-            callback(new Error('Got html error code ' + error.response.status));
-          } else {
-            this.log.error('setPowerState() failed: %s', error.message);
-            callback(error);
-          }
-        });
+      try {
+        const urlObject = on ? this.power.onUrl : this.power.offUrl;
+        const response = await http.httpRequest(urlObject);
+        if (response.status !== 200) {
+          this.log.error(`setPowerState() http request returned http error code ${response.status}: ${response.data}`);
+          throw new Error('Got html error code ' + response.status);
+        }
+        this.log.debug(`setPowerState() Successfully set power to ${on ? 'ON' : 'OFF'}.`);
+      } catch (error: any) {
+        this.log.error(`setPowerState() http request failed: ${error.message}`);
+        throw error;
+      }
     } else {
       this.mqttClient.publish(this.power.setTopic, on, (error: any) => {
         if (error) {
@@ -805,63 +816,58 @@ class HttpLightbulb {
         } else {
           this.log.debug(`setPowerState() Successfully set power to ${on ? 'ON' : 'OFF'}`);
         }
-        callback(error);
       });
     }
   }
 
-  getBrightness(callback: any) {
+  getBrightness = async(): Promise<number> => {
     if (!this.brightnessCache.shouldQuery()) {
       const value = this.homebridgeService.getCharacteristic(Characteristic.Brightness).value;
       this.log.debug(`getBrightness() returning cached value '${value}'${this.brightnessCache.isInfinite()? ' (infinite cache)': ''}`);
-
-      callback(null, value);
-      return;
+      return value;
     }
 
-    http.httpRequest(this.brightness.statusUrl)
-      .then(response => {
-        let body = response.data;
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        this.log.debug(`getBrightness() request returned successfully (${response.status}). Body: '${body}'`);
+    try {
+      const response = await http.httpRequest(this.brightness.statusUrl);
+      let body = response.data;
+      if (typeof body !== 'string') {
+        body = JSON.stringify(body);
+      }
+      this.log.debug(`getBrightness() request returned successfully (${response.status}). Body: '${body}'`);
 
-        let brightness;
-        try {
-          brightness = parseInt(utils.extractValueFromPattern(this.brightness.statusPattern, body, this.brightness.patternGroupToExtract));
-        } catch (error: any) {
-          this.log.error('getBrightness() error occurred while extracting brightness from body: ' + error.message);
-          callback(new Error('pattern error'));
-          return;
-        }
+      let brightness;
+      try {
+        brightness = parseInt(utils.extractValueFromPattern(this.brightness.statusPattern, body, this.brightness.patternGroupToExtract));
+      } catch (error: any) {
+        this.log.error('getBrightness() error occurred while extracting brightness from body: ' + error.message);
+        throw new Error('pattern error');
+      }
 
-        if (this.brightness.unit === BrightnessUnit.RGB) {
-          brightness = Math.round((brightness / 254) * 100);
-        }
+      if (this.brightness.unit === BrightnessUnit.RGB) {
+        brightness = Math.round((brightness / 254) * 100);
+      }
 
-        if (brightness >= 0 && brightness <= 100) {
-          this.log.info('Brightness is currently at %s%%', brightness);
+      if (brightness >= 0 && brightness <= 100) {
+        this.log.info('Brightness is currently at %s%%', brightness);
 
-          this.brightnessCache.queried();
-          callback(null, brightness);
-        } else {
-          this.log.warn('getBrightness() brightness is not in range of 0-100 % (actual: %s)', brightness);
-          callback(new Error('invalid range'));
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`getBrightness() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('getBrightness() failed: %s', error.message);
-          callback(error);
-        }
-      });
+        this.brightnessCache.queried();
+        return brightness;
+      } else {
+        this.log.warn('getBrightness() brightness is not in range of 0-100 % (actual: %s)', brightness);
+        throw new Error('invalid range');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`getBrightness() http request returned http error code ${error.response.status}: ${error.response.data}`);
+        throw new Error('Got html error code ' + error.response.status);
+      } else {
+        this.log.error('getBrightness() failed: %s', error.message);
+        throw error;
+      }
+    }
   }
 
-  setBrightness(brightness: any, callback: any) {
+  setBrightness = async (brightness: number): Promise<void> => {
     const brightnessPercentage = brightness;
     if (this.brightness.unit === BrightnessUnit.RGB) {
       brightness = Math.round((brightness * 254) / 100);
@@ -871,264 +877,257 @@ class HttpLightbulb {
       this.withholdPowerCall = true;
     }
 
-    setTimeout(() => {
-      http.httpRequest(this.brightness.setUrl, {searchValue: '%s', replacer: `${brightness}`}, ...this._collectCurrentValuesForReplacer())
-        .then(response => {
-          this.log.debug(`setBrightness() Successfully set brightness to ${brightnessPercentage}%. Body: '${response.data}'`);
-          callback();
-        })
-        .catch(error => {
-          if (error.response) {
-            this.log.error(`setBrightness() http request returned http error code ${error.response.status}: ${error.response.data}`);
-            callback(new Error('Got html error code ' + error.response.status));
-          } else {
-            this.log.error('setBrightness() failed: %s', error.message);
-            callback(error);
-          }
-        });
-    }, 0);
+    try {
+      const response = await http.httpRequest(
+        this.brightness.setUrl,
+        { searchValue: '%s', replacer: `${brightness}` },
+        ...this._collectCurrentValuesForReplacer(),
+      );
+
+      this.log.debug(`setBrightness() Successfully set brightness to ${brightnessPercentage}%. Body: '${response.data}'`);
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`setBrightness() http request returned http error code ${error.response.status}: ${error.response.data}`);
+      } else {
+        this.log.error('setBrightness() failed: %s', error.message);
+      }
+      throw error;
+    }
   }
 
-  getHue(callback: any) {
+  getHue = async(): Promise<number> => {
     if (this.colorMode === ColorMode.TEMPERATURE) {
-      callback(null, this.homebridgeService.getCharacteristic(Characteristic.Hue).value);
-      return;
+      const value = this.homebridgeService.getCharacteristic(Characteristic.Hue).value;
+      this.log.debug(`getHue() returning cached value '${value}'${this.hueCache.isInfinite()? ' (infinite cache)': ''}`);
+      return value;
     }
 
     if (!this.hueCache.shouldQuery()) {
       const value = this.homebridgeService.getCharacteristic(Characteristic.Hue).value;
       this.log.debug(`getHue() returning cached value '${value}'${this.hueCache.isInfinite()? ' (infinite cache)': ''}`);
-
-      callback(null, value);
-      return;
+      return value;
     }
 
-    http.httpRequest(this.hue.statusUrl)
-      .then(response => {
-        let body = response.data;
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        this.log.debug(`getHue() request returned successfully (${response.status}). Body '${body}'`);
+    try {
+      const response = await http.httpRequest(this.hue.statusUrl);
+      let body = response.data;
+      if (typeof body !== 'string') {
+        body = JSON.stringify(body);
+      }
+      this.log.debug(`getHue() request returned successfully (${response.status}). Body '${body}'`);
 
-        let hue;
-        try {
-          hue = parseFloat(utils.extractValueFromPattern(this.hue.statusPattern, body, this.hue.patternGroupToExtract));
-        } catch (error: any) {
-          this.log.error('getHue() error occurred while extracting hue from body: ' + error.message);
-          callback(new Error('pattern error'));
-          return;
-        }
+      let hue;
+      try {
+        hue = parseFloat(utils.extractValueFromPattern(this.hue.statusPattern, body, this.hue.patternGroupToExtract));
+      } catch (error: any) {
+        this.log.error('getHue() error occurred while extracting hue from body: ' + error.message);
+        throw new Error('pattern error');
+      }
 
-        if (this.hue.unit === HueUnit.ZIGBEE) {
-          hue = Math.round((hue * 360) / 65535);
-        }
+      if (this.hue.unit === HueUnit.ZIGBEE) {
+        hue = Math.round((hue * 360) / 65535);
+      }
 
-        if (hue >= 0 && hue <= 360) {
-          this.log.info('Hue is currently at %s', hue);
+      if (hue >= 0 && hue <= 360) {
+        this.log.info('Hue is currently at %s', hue);
 
-          this.hueCache.queried();
-          callback(null, hue);
-        } else {
-          this.log.warn('getHue() hue is not in range of 0-360 (actual: %s)', hue);
-          callback(new Error('invalid range'));
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`getHue() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('getHue() failed: %s', error.message);
-          callback(error);
-        }
-      });
+        this.hueCache.queried();
+        return hue;
+      } else {
+        this.log.warn('getHue() hue is not in range of 0-360 (actual: %s)', hue);
+        throw new Error('invalid range');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`getHue() http request returned http error code ${error.response.status}: ${error.response.data}`);
+        throw new Error('Got html error code ' + error.response.status);
+      } else {
+        this.log.error('getHue() failed: %s', error.message);
+        throw error;
+      }
+    }
   }
 
-  setHue(hue: any, callback: any) {
+  setHue = async (hue: number): Promise<void> => {
     const hueHSV = hue;
     if (this.hue.unit === HueUnit.ZIGBEE) {
       hue = Math.round((hue / 360) * 65535);
     }
 
-    http.httpRequest(this.hue.setUrl, {searchValue: '%s', replacer: `${hue}`}, ...this._collectCurrentValuesForReplacer())
-      .then(response => {
-        this.log.debug(`setHue() Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
+    try {
+      const response = await http.httpRequest(this.hue.setUrl, { searchValue: '%s', replacer: `${hue}` }, ...this._collectCurrentValuesForReplacer());
+      this.log.debug(`setHue() Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
 
-        this.colorMode = ColorMode.COLOR;
-        callback();
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`setHue() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('setHue() failed: %s', error.message);
-          callback(error);
-        }
-      });
+      this.colorMode = ColorMode.COLOR;
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`setHue() http request returned http error code ${error.response.status}: ${error.response.data}`);
+      } else {
+        this.log.error('setHue() failed: %s', error.message);
+      }
+      throw error;
+    }
   }
 
-  getSaturation(callback: any) {
+  getSaturation = async (): Promise<number> => {
     if (this.colorMode === ColorMode.TEMPERATURE) {
-      callback(null, this.homebridgeService.getCharacteristic(Characteristic.Saturation).value);
-      return;
+      const value = this.homebridgeService.getCharacteristic(Characteristic.Saturation).value;
+      this.log.debug(`getSaturation() returning cached value '${value}'${this.saturationCache.isInfinite()? ' (infinite cache)': ''}`);
+      return value;
     }
 
     if (!this.saturationCache.shouldQuery()) {
       const value = this.homebridgeService.getCharacteristic(Characteristic.Saturation).value;
       this.log.debug(`getSaturation() returning cached value '${value}'${this.saturationCache.isInfinite()? ' (infinite cache)': ''}`);
-
-      callback(null, value);
-      return;
+      return value;
     }
 
-    http.httpRequest(this.saturation.statusUrl)
-      .then(response => {
-        let body = response.data;
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        this.log.debug(`getSaturation() request returned successfully (${response.status}). Body '${body}'`);
+    try {
+      const response = await http.httpRequest(this.saturation.statusUrl);
+      let body = response.data;
+      if (typeof body !== 'string') {
+        body = JSON.stringify(body);
+      }
+      this.log.debug(`getSaturation() request returned successfully (${response.status}). Body '${body}'`);
 
-        let saturation;
-        try {
-          saturation = parseFloat(utils.extractValueFromPattern(this.saturation.statusPattern, body, this.saturation.patternGroupToExtract));
-        } catch (error: any) {
-          this.log.error('getSaturation() error occurred while extracting saturation from body: ' + error.message);
-          callback(new Error('pattern error'));
-          return;
-        }
+      let saturation;
+      try {
+        saturation = parseFloat(utils.extractValueFromPattern(this.saturation.statusPattern, body, this.saturation.patternGroupToExtract));
+      } catch (error: any) {
+        this.log.error('getSaturation() error occurred while extracting saturation from body: ' + error.message);
+        throw new Error('pattern error');
+      }
 
-        if (this.saturation.unit === SaturationUnit.RGB) {
-          saturation = Math.round((saturation / 254) * 100);
-        }
+      if (this.saturation.unit === SaturationUnit.RGB) {
+        saturation = Math.round((saturation / 254) * 100);
+      }
 
-        if (saturation >= 0 && saturation <= 100) {
-          this.log.info('Saturation is currently at %s%', saturation);
+      if (saturation >= 0 && saturation <= 100) {
+        this.log.info('Saturation is currently at %s%', saturation);
 
-          this.saturationCache.queried();
-          callback(null, saturation);
-        } else {
-          this.log.warn('getSaturation() saturation is not in range of 0-100 (actual: %s)', saturation);
-          callback(new Error('invalid range'));
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`getSaturation() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('getSaturation() failed: %s', error.message);
-          callback(error);
-        }
-      });
+        this.saturationCache.queried();
+        return saturation;
+      } else {
+        this.log.warn('getSaturation() saturation is not in range of 0-100 (actual: %s)', saturation);
+        throw new Error('invalid range');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`getSaturation() http request returned http error code ${error.response.status}: ${error.response.data}`);
+        throw new Error('Got html error code ' + error.response.status);
+      } else {
+        this.log.error('getSaturation() failed: %s', error.message);
+        throw error;
+      }
+    }
   }
 
-  setSaturation(saturation: any, callback: any) {
+  setSaturation = async (saturation: number): Promise<void> => {
     const saturationPercentage = saturation;
     if (this.saturation.unit === SaturationUnit.RGB) {
       saturation = Math.round((saturation * 254) / 100);
     }
 
-    http.httpRequest(this.saturation.setUrl, {searchValue: '%s', replacer: `${saturation}`}, ...this._collectCurrentValuesForReplacer())
-      .then(response => {
-        this.log.debug(`setSaturation() Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
+    try {
+      const response = await http.httpRequest(
+        this.saturation.setUrl,
+        { searchValue: '%s', replacer: `${saturation}` },
+        ...this._collectCurrentValuesForReplacer(),
+      );
+      this.log.debug(`setSaturation() Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
 
-        this.colorMode = ColorMode.COLOR;
-        callback();
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`setSaturation() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('setSaturation() failed: %s', error.message);
-          callback(error);
-        }
-      });
+      this.colorMode = ColorMode.COLOR;
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`setSaturation() http request returned http error code ${error.response.status}: ${error.response.data}`);
+      } else {
+        this.log.error('setSaturation() failed: %s', error.message);
+      }
+      throw error;
+    }
   }
 
-  getColorTemperature(callback: any) {
+  getColorTemperature = async (): Promise<number> => {
     if (!this.colorTemperatureCache.shouldQuery()) {
       const value = this.homebridgeService.getCharacteristic(Characteristic.ColorTemperature).value;
       this.log.debug(`getColorTemperature() returning cached value '${value}'${this.colorTemperatureCache.isInfinite()? ' (infinite cache)': ''}`);
 
-      callback(null, value);
-      return;
+      return value;
     }
 
     if (this.colorMode !== ColorMode.TEMPERATURE) {
-      callback(null, this.colorTemperature.minValue);
-      return;
+      return this.colorTemperature.minValue;
     }
 
-    http.httpRequest(this.colorTemperature.statusUrl)
-      .then(response => {
-        let body = response.data;
-        if (typeof body !== 'string') {
-          body = JSON.stringify(body);
-        }
-        this.log.debug(`getColorTemperature() request returned successfully (${response.status}). Body '${body}'`);
+    try {
+      const response = await http.httpRequest(this.colorTemperature.statusUrl);
+      let body = response.data;
+      if (typeof body !== 'string') {
+        body = JSON.stringify(body);
+      }
+      this.log.debug(`getColorTemperature() request returned successfully (${response.status}). Body '${body}'`);
 
-        let colorTemperature;
-        try {
-          colorTemperature = parseInt(utils.extractValueFromPattern(this.colorTemperature.statusPattern, body, this.colorTemperature.patternGroupToExtract));
-        } catch (error: any) {
-          this.log.error('getColorTemperature() error occurred while extracting colorTemperature from body: ' + error.message);
-          callback(new Error('pattern error'));
-          return;
-        }
+      let colorTemperature;
+      try {
+        colorTemperature = parseInt(utils.extractValueFromPattern(this.colorTemperature.statusPattern, body, this.colorTemperature.patternGroupToExtract));
+      } catch (error: any) {
+        this.log.error('getColorTemperature() error occurred while extracting colorTemperature from body: ' + error.message);
+        throw new Error('pattern error');
+      }
 
-        if (this.colorTemperature.unit === TemperatureUnit.KELVIN) {
-          colorTemperature = Math.round(1000000 / colorTemperature);
-        } // converting Kelvin to mired
+      if (this.colorTemperature.unit === TemperatureUnit.KELVIN) {
+        colorTemperature = Math.round(1000000 / colorTemperature);
+      } // converting Kelvin to mired
 
-        if (colorTemperature >= this.colorTemperature.minValue && colorTemperature <= this.colorTemperature.maxValue) {
-          this.log.info(`colorTemperature is currently at ${colorTemperature} Mired`);
+      if (colorTemperature >= this.colorTemperature.minValue && colorTemperature <= this.colorTemperature.maxValue) {
+        this.log.info(`colorTemperature is currently at ${colorTemperature} Mired`);
 
-          this.colorTemperatureCache.queried();
-          callback(null, colorTemperature);
-        } else {
-          this.log.warn('getColorTemperature() colorTemperature is not in range of 0-100 (actual: %s)', colorTemperature);
-          callback(new Error('invalid range'));
-        }
-      })
-      .catch(error => {
+        this.colorTemperatureCache.queried();
+        return colorTemperature;
+      } else {
+        this.log.warn('getColorTemperature() colorTemperature is not in range of 0-100 (actual: %s)', colorTemperature);
+        throw new Error('invalid range');
+      }
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`getColorTemperature() http request returned http error code ${error.response.status}: ${error.response.data}`);
+        throw new Error('Got html error code ' + error.response.status);
+      } else {
+        this.log.error('getColorTemperature() failed: %s', error.message);
         if (error.response) {
           this.log.error(`getColorTemperature() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
+          throw new Error('Got html error code ' + error.response.status);
         } else {
           this.log.error('getColorTemperature() failed: %s', error.message);
-          callback(error);
+          throw error;
         }
-      });
+      }
+    }
   }
 
-  setColorTemperature(colorTemperature: any, callback: any) {
+  setColorTemperature = async (colorTemperature: number): Promise<void> => {
     const colorTemperatureMired = colorTemperature;
     if (this.colorTemperature.unit === TemperatureUnit.KELVIN) {
       colorTemperature = Math.round(1000000 / colorTemperature);
     } // converting mired to Kelvin
 
-    http.httpRequest(this.colorTemperature.setUrl, {searchValue: '%s', replacer: `${colorTemperature}`}, ...this._collectCurrentValuesForReplacer())
-      .then(response => {
-        this.log.debug(`setColorTemperature() Successfully set colorTemperature to ${colorTemperatureMired} Mired. Body: '${response.data}'`);
+    try {
+      const response = await http.httpRequest(
+        this.colorTemperature.setUrl,
+        { searchValue: '%s', replacer: `${colorTemperature}` },
+        ...this._collectCurrentValuesForReplacer(),
+      );
+      this.log.debug(`setColorTemperature() Successfully set colorTemperature to ${colorTemperatureMired} Mired. Body: '${response.data}'`);
 
-        this.colorMode = ColorMode.TEMPERATURE;
-        callback();
-
-        this._updateColorByColorTemperature(colorTemperatureMired);
-      })
-      .catch(error => {
-        if (error.response) {
-          this.log.error(`setColorTemperature() http request returned http error code ${error.response.status}: ${error.response.data}`);
-          callback(new Error('Got html error code ' + error.response.status));
-        } else {
-          this.log.error('setColorTemperature() failed: %s', error.message);
-          callback(error);
-        }
-      });
+      this.colorMode = ColorMode.TEMPERATURE;
+    } catch (error: any) {
+      if (error.response) {
+        this.log.error(`setColorTemperature() http request returned http error code ${error.response.status}: ${error.response.data}`);
+      } else {
+        this.log.error('setColorTemperature() failed: %s', error.message);
+      }
+      throw error;
+    }
   }
 
   _collectCurrentValuesForReplacer() {
