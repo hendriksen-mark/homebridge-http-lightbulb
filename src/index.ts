@@ -31,7 +31,6 @@ type HttpLightConfig = {
     auth?: {
         username?: string;
         password?: string;
-        sendImmediately?: boolean;
     };
     pullInterval?: number;
     notificationID?: string;
@@ -110,7 +109,6 @@ class HttpLightbulb {
   auth?: {
         username?: string;
         password?: string;
-        sendImmediately?: boolean;
     };
 
   constructor(log: Logging, config: HttpLightConfig, api: API) {
@@ -172,10 +170,6 @@ class HttpLightbulb {
           if (value && value.auth && config.auth) {
             value.auth.username = config.auth.username;
             value.auth.password = config.auth.password;
-
-            if (typeof config.auth.sendImmediately === 'boolean') {
-              value.auth.sendImmediately = config.auth.sendImmediately;
-            }
           }
         })
       }
@@ -776,11 +770,7 @@ class HttpLightbulb {
       this.statusCache.queried();
       return switchedOn;
     } catch (error: any) {
-      if (error.response) {
-        this.log.error(`getPowerState() http request returned http error code ${error.response.status}: ${error.response.data}`);
-      } else {
-        this.log.error('getPowerState() failed: %s', error.message);
-      }
+      this.log.error(`getPowerState() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
       throw error;
     }
   }
@@ -803,7 +793,7 @@ class HttpLightbulb {
           this.log.error(`setPowerState() http request returned http error code ${response.status}: ${response.data}`);
           throw new Error('Got html error code ' + response.status);
         }
-        this.log.debug(`setPowerState() Successfully set power to ${on ? 'ON' : 'OFF'}.`);
+        this.log.debug(`Successfully set power to ${on ? 'ON' : 'OFF'}.`);
       } catch (error: any) {
         this.log.error(`setPowerState() http request failed: ${error.message}`);
         throw error;
@@ -813,7 +803,7 @@ class HttpLightbulb {
         if (error) {
           this.log.error(`setPowerState() error occurred publishing to ${this.power.setTopic}: ${error.message}`);
         } else {
-          this.log.debug(`setPowerState() Successfully set power to ${on ? 'ON' : 'OFF'}`);
+          this.log.debug(`Successfully set power to ${on ? 'ON' : 'OFF'}`);
         }
       });
     }
@@ -883,13 +873,9 @@ class HttpLightbulb {
         ...this._collectCurrentValuesForReplacer(),
       );
 
-      this.log.debug(`setBrightness() Successfully set brightness to ${brightnessPercentage}%. Body: '${response.data}'`);
+      this.log.debug(`Successfully set brightness to ${brightnessPercentage}%. Body: '${response.data}'`);
     } catch (error: any) {
-      if (error.response) {
-        this.log.error(`setBrightness() http request returned http error code ${error.response.status}: ${error.response.data}`);
-      } else {
-        this.log.error('setBrightness() failed: %s', error.message);
-      }
+      this.log.error(`setBrightness() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
       throw error;
     }
   }
@@ -955,15 +941,11 @@ class HttpLightbulb {
 
     try {
       const response = await http.httpRequest(this.hue.setUrl, { searchValue: '%s', replacer: `${hue}` }, ...this._collectCurrentValuesForReplacer());
-      this.log.debug(`setHue() Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
+      this.log.debug(`Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
 
       this.colorMode = ColorMode.COLOR;
     } catch (error: any) {
-      if (error.response) {
-        this.log.error(`setHue() http request returned http error code ${error.response.status}: ${error.response.data}`);
-      } else {
-        this.log.error('setHue() failed: %s', error.message);
-      }
+      this.log.error(`setHue() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
       throw error;
     }
   }
@@ -1033,15 +1015,11 @@ class HttpLightbulb {
         { searchValue: '%s', replacer: `${saturation}` },
         ...this._collectCurrentValuesForReplacer(),
       );
-      this.log.debug(`setSaturation() Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
+      this.log.debug(`Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
 
       this.colorMode = ColorMode.COLOR;
     } catch (error: any) {
-      if (error.response) {
-        this.log.error(`setSaturation() http request returned http error code ${error.response.status}: ${error.response.data}`);
-      } else {
-        this.log.error('setSaturation() failed: %s', error.message);
-      }
+      this.log.error(`setSaturation() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
       throw error;
     }
   }
@@ -1116,15 +1094,11 @@ class HttpLightbulb {
         { searchValue: '%s', replacer: `${colorTemperature}` },
         ...this._collectCurrentValuesForReplacer(),
       );
-      this.log.debug(`setColorTemperature() Successfully set colorTemperature to ${colorTemperatureMired} Mired. Body: '${response.data}'`);
+      this.log.debug(`Successfully set colorTemperature to ${colorTemperatureMired} Mired. Body: '${response.data}'`);
 
       this.colorMode = ColorMode.TEMPERATURE;
     } catch (error: any) {
-      if (error.response) {
-        this.log.error(`setColorTemperature() http request returned http error code ${error.response.status}: ${error.response.data}`);
-      } else {
-        this.log.error('setColorTemperature() failed: %s', error.message);
-      }
+      this.log.error(`setColorTemperature() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
       throw error;
     }
   }

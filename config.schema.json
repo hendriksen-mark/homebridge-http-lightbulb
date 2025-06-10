@@ -194,11 +194,6 @@
           "password": {
             "type": "string",
             "title": "Password"
-          },
-          "sendImmediately": {
-            "type": "boolean",
-            "title": "Send Immediately",
-            "placeholder": true
           }
         }
       },
@@ -487,8 +482,7 @@
       "flex-direction": "column",
       "items": [
         "auth.username",
-        "auth.password",
-        "auth.sendImmediately"
+        "auth.password"
       ]
     },
     {

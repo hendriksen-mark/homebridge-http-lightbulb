@@ -26,12 +26,12 @@
     "accessories": [
         {
             "name": "TM1637",
-            "onUrl": "http://slaapkamer-temp.lan:8000/on",
-            "offUrl": "http://slaapkamer-temp.lan:8000/off",
-            "statusUrl": "http://slaapkamer-temp.lan:8000/status",
+            "onUrl": "http://localhost:8000/on",
+            "offUrl": "http://localhost:8000/off",
+            "statusUrl": "http://localhost:8000/status",
             "brightness": {
-                "setUrl": "http://slaapkamer-temp.lan:8000/Bri/%s",
-                "statusUrl": "http://slaapkamer-temp.lan:8000/infoBri",
+                "setUrl": "http://localhost:8000/brightness/%s",
+                "statusUrl": "http://localhost:8000/brightness",
                 "unit": "percent",
                 "withholdPowerUpdate": true
             },
