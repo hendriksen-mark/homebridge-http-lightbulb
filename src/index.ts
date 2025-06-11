@@ -14,28 +14,28 @@ const FIRMWARE_REVISION: string = PACKAGE_JSON.version;
 let Service: any, Characteristic: any;
 
 type HttpLightConfig = {
-    name: string;
-    power?: any;
-    onUrl?: any;
-    offUrl?: any;
-    statusUrl?: any;
-    statusCache?: number;
-    brightness?: any;
-    brightnessCache?: number;
-    hue?: any;
-    hueCache?: number;
-    saturation?: any;
-    saturationCache?: number;
-    colorTemperature?: any;
-    colorTemperatureCache?: number;
-    auth?: {
-        username?: string;
-        password?: string;
-    };
-    pullInterval?: number;
-    notificationID?: string;
-    notificationPassword?: string;
-    mqtt?: any;
+  name: string;
+  power?: any;
+  onUrl?: any;
+  offUrl?: any;
+  statusUrl?: any;
+  statusCache?: number;
+  brightness?: any;
+  brightnessCache?: number;
+  hue?: any;
+  hueCache?: number;
+  saturation?: any;
+  saturationCache?: number;
+  colorTemperature?: any;
+  colorTemperatureCache?: number;
+  auth?: {
+    username?: string;
+    password?: string;
+  };
+  pullInterval?: number;
+  notificationID?: string;
+  notificationPassword?: string;
+  mqtt?: any;
 };
 
 const BrightnessUnit = Object.freeze({
@@ -107,9 +107,9 @@ class HttpLightbulb {
   homebridgeService: any;
   api: API;
   auth?: {
-        username?: string;
-        password?: string;
-    };
+    username?: string;
+    password?: string;
+  };
 
   constructor(log: Logging, config: HttpLightConfig, api: API) {
     this.log = log;
