@@ -402,9 +402,6 @@
       "type": "fieldset",
       "title": "Basic",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "onUrl",
         "offUrl",
@@ -416,9 +413,6 @@
       "type": "fieldset",
       "title": "Brightness",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "brightness.setUrl",
         "brightness.statusUrl",
@@ -430,11 +424,8 @@
     },
     {
       "type": "fieldset",
-      "title": "hue",
+      "title": "Hue",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "hue.setUrl",
         "hue.statusUrl",
@@ -447,9 +438,6 @@
       "type": "fieldset",
       "title": "Saturation",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "saturation.setUrl",
         "saturation.statusUrl",
@@ -462,9 +450,6 @@
       "type": "fieldset",
       "title": "Color Temperature",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "colorTemperature.setUrl",
         "colorTemperature.statusUrl",
@@ -477,9 +462,6 @@
       "type": "fieldset",
       "title": "HTTP Authentication",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "auth.username",
         "auth.password"
@@ -489,9 +471,6 @@
       "type": "fieldset",
       "title": "Advanced",
       "expandable": true,
-      "flex-flow": "column wrap",
-      "displayFlex": true,
-      "flex-direction": "column",
       "items": [
         "statusCache",
         "brightnessCache",
@@ -503,9 +482,6 @@
           "type": "fieldset",
           "title": "MQTT Options",
           "expandable": true,
-          "flex-flow": "column wrap",
-          "displayFlex": true,
-          "flex-direction": "column",
           "items": [
             "mqtt.host",
             "mqtt.port",
@@ -513,9 +489,6 @@
               "type": "fieldset",
               "title": "Credentials",
               "expandable": true,
-              "flex-flow": "column wrap",
-              "displayFlex": true,
-              "flex-direction": "column",
               "items": [
                 "mqtt.credentials.username",
                 "mqtt.credentials.password"
@@ -525,9 +498,6 @@
               "type": "fieldset",
               "title": "MQTT Subscriptions",
               "expandable": true,
-              "flex-flow": "column wrap",
-              "displayFlex": true,
-              "flex-direction": "column",
               "items": [
                   "mqtt.subscriptions.topic",
                   "mqtt.subscriptions.characteristic",
@@ -548,9 +518,6 @@
           "type": "fieldset",
           "title": "MQTT Set Power Topic",
           "expandable": true,
-          "flex-flow": "column wrap",
-          "displayFlex": true,
-          "flex-direction": "column",
           "items": [
             "setPowerTopic.topic",
             "setPowerTopic.qos",
@@ -563,9 +530,6 @@
           "type": "fieldset",
           "title": "MQTT Get Power Topic",
           "expandable": true,
-          "flex-flow": "column wrap",
-          "displayFlex": true,
-          "flex-direction": "column",
           "items": [
             "getPowerTopic.topic",
             "getPowerTopic.qos",
@@ -579,9 +543,6 @@
       "type": "fieldset",
       "title": "Notification Server",
       "expandable": true,
-      "flex-flow": "row wrap",
-      "displayFlex": true,
-      "flex-direction": "row",
       "items": [
         "notificationID",
         "notificationPassword"
