@@ -940,9 +940,13 @@ class HttpLightbulb {
     }
 
     try {
-      const response = await http.httpRequest(this.hue.setUrl, { searchValue: '%s', replacer: `${hue}` }, ...this._collectCurrentValuesForReplacer());
-      this.log.debug(`Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
+      const response = await http.httpRequest(
+        this.hue.setUrl,
+        { searchValue: '%s', replacer: `${hue}` },
+        ...this._collectCurrentValuesForReplacer(),
+      );
 
+      this.log.debug(`Successfully set hue to ${hueHSV}. Body: '${response.data}'`);
       this.colorMode = ColorMode.COLOR;
     } catch (error: any) {
       this.log.error(`setHue() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
@@ -1015,8 +1019,8 @@ class HttpLightbulb {
         { searchValue: '%s', replacer: `${saturation}` },
         ...this._collectCurrentValuesForReplacer(),
       );
-      this.log.debug(`Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
 
+      this.log.debug(`Successfully set saturation to ${saturationPercentage}%. Body: '${response.data}'`);
       this.colorMode = ColorMode.COLOR;
     } catch (error: any) {
       this.log.error(`setSaturation() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
@@ -1094,8 +1098,8 @@ class HttpLightbulb {
         { searchValue: '%s', replacer: `${colorTemperature}` },
         ...this._collectCurrentValuesForReplacer(),
       );
+      
       this.log.debug(`Successfully set colorTemperature to ${colorTemperatureMired} Mired. Body: '${response.data}'`);
-
       this.colorMode = ColorMode.TEMPERATURE;
     } catch (error: any) {
       this.log.error(`setColorTemperature() failed: ${error.response.status}: ${error.response.data} ${error.message}`);
